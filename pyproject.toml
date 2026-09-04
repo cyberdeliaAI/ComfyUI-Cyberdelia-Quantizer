@@ -1,19 +1,30 @@
 [project]
-name = "comfyui-cyberdelia-quantizer"
+name = "cyberdelia-quantizer"
 version = "1.0.0"
 description = "ComfyUI-native mixed-precision checkpoint converter with exact per-layer metadata."
+readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
+license = {file = "LICENSE"}
 authors = [{name = "CyberdeliaAI"}]
 dependencies = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
 
 [project.urls]
+Homepage = "https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer"
 Repository = "https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer"
+Documentation = "https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer#readme"
+Issues = "https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer/issues"
 
 [tool.comfy]
-PublisherId = "cyberdeliaAI"
+PublisherId = "cyberdelia"
 DisplayName = "Cyberdelia Quantizer"
-Icon = ""
+Icon = "https://raw.githubusercontent.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer/main/assets/icon.png"
+requires-comfyui = ">=0.34.0"
 
 [tool.ruff]
 line-length = 110

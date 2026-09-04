@@ -1,0 +1,7 @@
+.git/
+.github/
+tests/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.zip

@@ -69,6 +69,12 @@ def fake_safetensors_module(handle):
 
 
 class QuantizationContractTests(unittest.TestCase):
+    def test_registry_metadata_matches_cyberdelia_publisher(self):
+        metadata = (PACKAGE_PARENT / "ComfyUI-Cyberdelia-Quantizer" / "pyproject.toml").read_text()
+        self.assertIn('name = "cyberdelia-quantizer"', metadata)
+        self.assertIn('PublisherId = "cyberdelia"', metadata)
+        self.assertIn('/assets/icon.png"', metadata)
+
     def test_layer_name_keeps_model_prefix(self):
         weight = "model.diffusion_model.blocks.0.attn.to_q.weight"
         self.assertEqual(

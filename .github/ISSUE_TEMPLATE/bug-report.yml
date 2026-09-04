@@ -1,0 +1,80 @@
+name: Bug report
+description: Report a reproducible conversion or checkpoint compatibility problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not upload copyrighted model files. Header-only reports and logs are normally enough.
+
+  - type: input
+    id: comfyui-version
+    attributes:
+      label: ComfyUI version or commit
+      placeholder: "0.34.0 or commit hash"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Runtime
+      description: Include comfy-kitchen, Torch, CUDA, and GPU versions.
+      placeholder: "comfy-kitchen 0.2.31, Torch 2.x, CUDA 13.x, RTX ..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: Quantization format
+      options:
+        - FP8_E4M3
+        - FP8_E5M2
+        - NVFP4
+        - MXFP8
+        - INT8
+        - INT8_CONVROT
+        - INT4_CONVROT
+        - W4A8_INT8
+    validations:
+      required: true
+
+  - type: input
+    id: profile
+    attributes:
+      label: Model profile
+      placeholder: "Anima, Krea2, Z-Image-Turbo, ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: quant-check
+    attributes:
+      label: Cyberdelia Quant Check result
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain expected and actual behavior and include reproduction steps.
+    validations:
+      required: true
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Complete traceback
+      render: shell
+
+  - type: checkboxes
+    id: source
+    attributes:
+      label: Source confirmation
+      options:
+        - label: I used an original dense FP16/BF16 safetensors checkpoint, not an already-quantized file.
+          required: true

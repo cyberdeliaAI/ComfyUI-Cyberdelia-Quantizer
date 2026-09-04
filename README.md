@@ -1,5 +1,9 @@
 # ComfyUI Cyberdelia Quantizer
 
+<p align="center">
+  <img src="assets/icon.png" alt="Cyberdelia Quantizer icon" width="200">
+</p>
+
 [![Tests](https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer/actions/workflows/tests.yml/badge.svg)](https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer/actions/workflows/tests.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
@@ -51,13 +55,22 @@ a second lossy conversion.
 
 ## Installation
 
+### ComfyUI Manager
+
+After the first Comfy Registry release, search for **Cyberdelia Quantizer** in
+ComfyUI Manager, install it, and restart ComfyUI.
+
+### Git
+
 From the ComfyUI `custom_nodes` directory:
 
 ```bash
 git clone https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer.git
 ```
 
-Alternatively, download a release archive and extract it as:
+### Manual installation
+
+Download a release archive and extract it as:
 
 ```text
 ComfyUI/custom_nodes/ComfyUI-Cyberdelia-Quantizer
