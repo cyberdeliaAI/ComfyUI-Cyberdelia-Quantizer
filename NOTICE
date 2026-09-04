@@ -1,0 +1,7 @@
+Cyberdelia Quantizer
+Copyright 2026 Cyberdelia
+
+This project is an independent implementation informed by the public checkpoint
+contracts in Comfy-Org/ComfyUI and Comfy-Org/comfy-kitchen (Apache-2.0), and by
+the model profiles published in tritant/ComfyUI_Kitchen_nvfp4_Converter
+(Apache-2.0). It is not an official Comfy Org project.

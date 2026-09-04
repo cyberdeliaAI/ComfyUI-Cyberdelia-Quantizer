@@ -1,0 +1,23 @@
+[project]
+name = "comfyui-cyberdelia-quantizer"
+version = "1.0.0"
+description = "ComfyUI-native mixed-precision checkpoint converter with exact per-layer metadata."
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "CyberdeliaAI"}]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/cyberdeliaAI/ComfyUI-Cyberdelia-Quantizer"
+
+[tool.comfy]
+PublisherId = "cyberdeliaAI"
+DisplayName = "Cyberdelia Quantizer"
+Icon = ""
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
