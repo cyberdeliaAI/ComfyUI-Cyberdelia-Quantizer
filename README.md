@@ -45,6 +45,10 @@ uses the official compatibility-oriented marker `full_precision_matrix_mult=true
 - A current ComfyUI installation (version 0.34 or newer is recommended).
 - The `comfy-kitchen` version pinned by that ComfyUI release.
 - An original dense FP16/BF16 `.safetensors` diffusion model.
+- On Windows, safetensors 0.8 or newer is recommended. The node then reads tensors
+  with the `pread` backend instead of mmap, which avoids a known access violation
+  crash when large checkpoints are loaded inside a long-running ComfyUI process.
+  Older versions still work but fall back to mmap.
 
 Do not manually upgrade only `comfy-kitchen` while leaving ComfyUI behind. Update
 ComfyUI and its requirements together so their quantization contracts match.
@@ -90,6 +94,9 @@ match the host ComfyUI build.
 4. Leave `output_filename` empty to use the source filename plus a format suffix.
 5. Run once with `dry_run=true` if you want a plan without writing a file.
 6. Keep `strict=true` for release builds.
+
+Before a real conversion the node unloads the models ComfyUI has loaded, so the next
+generation reloads them. A dry run leaves them in place.
 
 The output is written beside the source model. Existing files are protected unless
 `overwrite=true`. Saving uses a temporary file, validates its marker/weight/sidecar

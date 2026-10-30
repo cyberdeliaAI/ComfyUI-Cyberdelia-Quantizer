@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -106,6 +107,37 @@ def resolve_output_path(input_path: Path, requested_name: str, format_name: str)
     return input_path.parent / filename
 
 
+_warned_mmap_fallback = False
+
+
+def open_safetensors(path: str | Path):
+    """Open a safetensors file for CPU reads, preferring the pread backend on Windows.
+
+    The default mmap backend maps the whole file into one torch storage and slices it per
+    tensor. On Windows that slice can crash the process with a native access violation in
+    get_tensor() for large files inside a long-running ComfyUI process (Comfy-Org/ComfyUI#15424).
+    safetensors >= 0.8 can read tensor bytes straight from the file instead, which avoids it.
+    """
+    global _warned_mmap_fallback
+    try:
+        from safetensors import safe_open
+    except ImportError as exc:
+        raise ConversionError("safetensors is missing from the ComfyUI environment.") from exc
+
+    if sys.platform == "win32":
+        try:
+            return safe_open(str(path), framework="pt", device="cpu", backend="pread")
+        except TypeError:
+            # safetensors < 0.8 has no backend option; fall back to mmap.
+            if not _warned_mmap_fallback:
+                _warned_mmap_fallback = True
+                print(
+                    "[Cyberdelia Quantizer] safetensors < 0.8 detected, using mmap. "
+                    "If conversion crashes with an access violation, update safetensors to 0.8+."
+                )
+    return safe_open(str(path), framework="pt", device="cpu")
+
+
 def _slice_info(handle, key: str) -> tuple[tuple[int, ...], str]:
     tensor_slice = handle.get_slice(key)
     return tuple(int(value) for value in tensor_slice.get_shape()), str(tensor_slice.get_dtype())
@@ -123,14 +155,9 @@ def _parse_old_quant_metadata(metadata: dict[str, str]) -> dict:
 
 
 def build_plan(input_path: Path, profile_name: str, format_name: str) -> tuple[ConversionPlan, dict[str, str]]:
-    try:
-        from safetensors import safe_open
-    except ImportError as exc:
-        raise ConversionError("safetensors is missing from the ComfyUI environment.") from exc
-
     profile = get_profile(profile_name)
     plan = ConversionPlan()
-    with safe_open(str(input_path), framework="pt", device="cpu") as handle:
+    with open_safetensors(input_path) as handle:
         metadata = dict(handle.metadata() or {})
         keys = sorted(handle.keys())
         key_set = set(keys)
@@ -198,7 +225,7 @@ def _clean_metadata(source_metadata: dict[str, str], report: ConversionReport) -
     metadata.update(
         {
             "converted_by": "ComfyUI-Cyberdelia-Quantizer",
-            "converter_version": "1.0.0",
+            "converter_version": "1.0.1",
             "quant_format": report.format_name,
             "quant_profile": report.profile_name,
             "quantized_tensor_count": str(report.quantized_count),
@@ -214,13 +241,8 @@ def validate_checkpoint(
     expected_markers: dict[str, dict] | None = None,
 ) -> dict[str, int]:
     """Validate marker-to-weight coupling without loading model weights into RAM."""
-    try:
-        from safetensors import safe_open
-    except ImportError as exc:
-        raise ConversionError("safetensors is missing from the ComfyUI environment.") from exc
-
     marker_count = 0
-    with safe_open(str(path), framework="pt", device="cpu") as handle:
+    with open_safetensors(path) as handle:
         keys = set(handle.keys())
         metadata = dict(handle.metadata() or {})
         if "_quantization_metadata" in metadata:
@@ -291,7 +313,6 @@ def convert_checkpoint(
     progress: ProgressCallback | None = None,
 ) -> ConversionReport:
     try:
-        from safetensors import safe_open
         from safetensors.torch import save_file
     except ImportError as exc:
         raise ConversionError("safetensors is missing from the ComfyUI environment.") from exc
@@ -338,7 +359,7 @@ def convert_checkpoint(
     completed = 0
 
     try:
-        with safe_open(str(input_path), framework="pt", device="cpu") as handle:
+        with open_safetensors(input_path) as handle:
             for key in sorted(handle.keys()):
                 source_tensor = handle.get_tensor(key)
                 planned = selected.get(key)

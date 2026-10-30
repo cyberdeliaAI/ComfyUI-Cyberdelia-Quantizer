@@ -5,17 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .checkpoint_io import ConversionError, validate_checkpoint
+from .checkpoint_io import ConversionError, open_safetensors, validate_checkpoint
 
 
 def inspect_checkpoint(path: str | Path) -> str:
-    try:
-        from safetensors import safe_open
-    except ImportError as exc:
-        raise RuntimeError("safetensors is missing from the ComfyUI environment.") from exc
-
     path = Path(path)
-    with safe_open(str(path), framework="pt", device="cpu") as handle:
+    with open_safetensors(path) as handle:
         keys = set(handle.keys())
         metadata = dict(handle.metadata() or {})
         weight_layers = {key[: -len(".weight")] for key in keys if key.endswith(".weight")}

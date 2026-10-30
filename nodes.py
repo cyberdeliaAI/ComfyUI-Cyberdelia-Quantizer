@@ -75,6 +75,12 @@ class CyberdeliaQuantizer:
             progress_bar.update_absolute(current)
             print(f"[Cyberdelia Quantizer] {current}/{total}: {tensor_name}")
 
+        if not dry_run:
+            # Conversion reads a multi-GB source and keeps the quantized output in RAM until
+            # it is saved, so release models ComfyUI still holds before starting.
+            comfy.model_management.unload_all_models()
+            comfy.model_management.soft_empty_cache()
+
         report = convert_checkpoint(
             input_path=input_path,
             requested_output_name=output_filename,

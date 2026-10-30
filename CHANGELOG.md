@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-10-30
+
+- Fix a Windows access violation crash in `get_tensor()` when converting large checkpoints
+  inside ComfyUI. Source and output files are now opened with the safetensors `pread` backend
+  on Windows (safetensors 0.8+), with a mmap fallback and a one-time warning on older versions.
+- Unload models held by ComfyUI before a real conversion to free RAM.
+
 ## 1.0.0 - 2026-09-04
 
 - Initial independent release.
