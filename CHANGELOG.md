@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 - 2026-11-03
+
+- Add a conservative `MOSS-Image` diffusion-model profile for Base, SFT,
+  fine-tunes and Turbo/DMD checkpoints, with split and fused QKV layouts.
+- Restrict MOSS conversion to recognized main-block attention/FFN projection
+  weights. Keep text refiners, image/text embedders, time embedding, shared
+  modulation, output projection, norms, biases and unknown layers in source dtype.
+- Support native unprefixed, `diffusion_model.*` and `model.diffusion_model.*`
+  keys without changing physical layer names or per-layer quantization markers.
+- Add regression tests for all 42 main blocks, sensitive layers, all format
+  shape contracts, source rejection and version metadata consistency.
+- Update conversion metadata to report converter version 1.1.0.
+
 ## 1.0.1 - 2026-10-30
 
 - Fix a Windows access violation crash in `get_tensor()` when converting large checkpoints

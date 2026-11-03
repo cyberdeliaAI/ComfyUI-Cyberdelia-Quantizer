@@ -115,7 +115,7 @@ It does not load the model weights into RAM.
 
 ## Profiles
 
-Dedicated profiles are included for Krea2, Anima, Z-Image Base/Turbo, Flux 1/2,
+Dedicated profiles are included for MOSS-Image Base/SFT/Turbo, Krea2, Anima, Z-Image Base/Turbo, Flux 1/2,
 Qwen Image, Wan 2.2, LTX-2, ACE-Step, Boogu Image, Chroma, ERNIE Image,
 Ideogram 4, MiniMax H3, and SeedVR. A conservative generic profile is also
 available.
@@ -124,6 +124,36 @@ A profile controls which sensitive layers stay in their original source dtype.
 Shape-incompatible layers are also kept unchanged and listed in the result.
 The Qwen Image 2512 profile keeps its sensitive `txt_mlp`/`txt_mod` weights in
 FP8 E4M3 when a more aggressive format is selected.
+
+### MOSS-Image / MOSS Turbo
+
+New in **1.1.0**: choose **`MOSS-Image`** for an original dense MOSS Base, SFT,
+fine-tune or merged Turbo checkpoint. The same profile handles separate Q/K/V
+weights and fused QKV weights in the native ComfyUI MOSS layout.
+
+The profile quantizes only the main blocks' attention and FFN projections.
+It preserves the following in their original source dtype:
+
+- Image and text embedders, including both text-refiner blocks.
+- Time embedding and shared block modulation.
+- Output modulation, the final image projection, norms and biases.
+- Other weights outside the recognized main-block projections.
+
+Unprefixed keys, `diffusion_model.*`, and `model.diffusion_model.*` are supported;
+the physical prefix remains unchanged in every marker and side tensor.
+Unknown layouts produce no eligible main-block weights rather than treating
+unrecognized layers as MOSS attention weights.
+
+For an SFT model with a separate DMD adapter, convert the dense SFT model first,
+then load the DMD LoRA in the generation workflow. Start with
+`quant_format=INT8_CONVROT`, `strict=true` and a dry run. Compare the real
+conversion against the dense model with matching prompt, seed and sampling
+settings before relying on image quality. The other formats remain available
+subject to their existing backend and hardware requirements.
+
+This profile targets the diffusion model. It does not add Qwen3.5 text-encoder
+or VAE conversion. Header/shape tests cover the native 42-block MOSS layout;
+small-tensor conversion checks do not establish quality on a full checkpoint.
 
 ## Design differences from the Tritant converter
 

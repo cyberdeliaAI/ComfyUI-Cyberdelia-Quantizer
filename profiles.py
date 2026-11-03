@@ -6,6 +6,7 @@ Format-specific shape checks are handled separately by :mod:`quant_formats`.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -15,10 +16,16 @@ class ModelProfile:
     excluded_fragments: tuple[str, ...]
     description: str
     forced_fp8_fragments: tuple[str, ...] = ()
+    eligible_weight_pattern: str | None = None
 
     def excludes(self, tensor_name: str) -> bool:
         lowered = tensor_name.lower()
-        return any(fragment.lower() in lowered for fragment in self.excluded_fragments)
+        if any(fragment.lower() in lowered for fragment in self.excluded_fragments):
+            return True
+        return (
+            self.eligible_weight_pattern is not None
+            and re.fullmatch(self.eligible_weight_pattern, tensor_name) is None
+        )
 
     def format_for(self, tensor_name: str, requested_format: str) -> str:
         lowered = tensor_name.lower()
@@ -59,6 +66,17 @@ PROFILES: dict[str, ModelProfile] = {
         "Krea2",
         ("first", "last", "tmlp", "tproj", "txtfusion", "txtmlp"),
         "Krea 2 / SingleStreamDiT profile.",
+    ),
+    "MOSS-Image": ModelProfile(
+        "MOSS-Image",
+        _COMMON_SENSITIVE + ("shared_block_modulation", "final_linear_video"),
+        "Conservative MOSS-Image Base/SFT and Turbo/DMD diffusion-model profile. "
+        "Quantizes main-block attention/FFN projections; preserves text refiners, "
+        "embedders, modulation and output layers in the source dtype.",
+        eligible_weight_pattern=(
+            r"(?:(?:model\.)?diffusion_model\.)?layers\.\d+\.proj\."
+            r"(?:q|k|v|qkv|o|ffn_up_gate|ffn_down)\.weight"
+        ),
     ),
     "Z-Image-Turbo": ModelProfile(
         "Z-Image-Turbo",

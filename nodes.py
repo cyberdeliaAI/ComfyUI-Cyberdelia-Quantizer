@@ -26,7 +26,14 @@ class CyberdeliaQuantizer:
                         "tooltip": "A filename only; output is written beside the source model.",
                     },
                 ),
-                "model_profile": (list(PROFILE_NAMES), {"default": "Krea2"}),
+                "model_profile": (
+                    list(PROFILE_NAMES),
+                    {
+                        "default": "Krea2",
+                        "tooltip": "Choose the diffusion-model architecture. MOSS-Image covers "
+                                   "Base/SFT and Turbo/DMD models; sensitive layers keep their source dtype.",
+                    },
+                ),
                 "quant_format": (list(FORMAT_NAMES), {"default": "INT8_CONVROT"}),
                 "device": (["auto", "cuda", "cpu"], {"default": "auto"}),
                 "strict": (

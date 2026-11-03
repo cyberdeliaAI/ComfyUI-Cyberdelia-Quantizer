@@ -225,7 +225,7 @@ def _clean_metadata(source_metadata: dict[str, str], report: ConversionReport) -
     metadata.update(
         {
             "converted_by": "ComfyUI-Cyberdelia-Quantizer",
-            "converter_version": "1.0.1",
+            "converter_version": "1.1.0",
             "quant_format": report.format_name,
             "quant_profile": report.profile_name,
             "quantized_tensor_count": str(report.quantized_count),

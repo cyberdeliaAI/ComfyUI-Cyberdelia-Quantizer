@@ -1,6 +1,6 @@
 [project]
 name = "cyberdelia-quantizer"
-version = "1.0.1"
+version = "1.1.0"
 description = "ComfyUI-native mixed-precision checkpoint converter with exact per-layer metadata."
 readme = "README.md"
 requires-python = ">=3.10"
